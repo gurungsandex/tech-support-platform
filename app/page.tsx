@@ -87,7 +87,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="mt-6 text-xl font-semibold text-secondary-900">Get Matched</h3>
                 <p className="mt-4 text-secondary-600">
-                  Verified IT professionals review your request and one will accept it. You'll be notified immediately.
+                  Verified IT professionals review your request and one will accept it. You&apos;ll be notified immediately.
                 </p>
               </div>
 
