@@ -1,0 +1,156 @@
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+import Avatar from '@/components/ui/Avatar'
+import { VerificationBadge } from '@/components/professionals/VerificationBadge'
+import { LayoutDashboard, Briefcase, User, LogOut } from 'lucide-react'
+import { signOut } from '@/lib/auth/flows'
+import { getProfessionalStats } from '@/lib/professionals/actions'
+
+export default async function ProfessionalLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+
+  if (error || !user) {
+    redirect('/login')
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile || profile.role !== 'it_professional') {
+    redirect('/login')
+  }
+
+  const { data: professionalProfile } = await supabase
+    .from('it_professional_profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .single()
+
+  const statsResult = await getProfessionalStats()
+  const stats = statsResult.data
+
+  const navItems = [
+    { href: '/professional/dashboard', label: 'Browse Requests', icon: LayoutDashboard },
+    { href: '/professional/my-requests', label: 'My Requests', icon: Briefcase },
+    { href: '/professional/profile', label: 'Profile', icon: User },
+  ]
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="hidden md:flex md:flex-shrink-0">
+          <div className="flex flex-col w-64 bg-white border-r border-gray-200">
+            <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+              <div className="flex items-center flex-shrink-0 px-4 mb-6">
+                <h1 className="text-xl font-bold text-gray-900">Professional Dashboard</h1>
+              </div>
+
+              {/* User Profile Card */}
+              <div className="px-4 mb-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Avatar
+                      name={profile.full_name || profile.email}
+                      size="md"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {profile.full_name || 'Professional'}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {profile.email}
+                      </p>
+                    </div>
+                  </div>
+                  {professionalProfile && (
+                    <div className="mb-3">
+                      <VerificationBadge status={professionalProfile.verification_status} showIcon={false} />
+                    </div>
+                  )}
+                  {stats && (
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Active:</span>
+                        <span className="font-medium text-gray-900">{stats.active_requests}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Completed:</span>
+                        <span className="font-medium text-gray-900">{stats.completed_requests}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Rating:</span>
+                        <span className="font-medium text-gray-900">
+                          {stats.average_rating > 0 ? stats.average_rating.toFixed(1) : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <nav className="flex-1 px-2 space-y-1">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  >
+                    <item.icon className="mr-3 h-5 w-5 text-gray-500 group-hover:text-gray-700" />
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Sign Out */}
+              <div className="px-2 mt-4">
+                <form action={signOut}>
+                  <button
+                    type="submit"
+                    className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-red-700 hover:text-red-900 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="mr-3 h-5 w-5" />
+                    Sign Out
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+          <nav className="flex justify-around">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center py-2 px-3 text-xs font-medium text-gray-700 hover:text-gray-900"
+              >
+                <item.icon className="h-6 w-6 mb-1" />
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <main className="flex-1">
+          <div className="py-6 px-4 sm:px-6 lg:px-8 pb-20 md:pb-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
