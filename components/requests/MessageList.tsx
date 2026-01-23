@@ -7,6 +7,7 @@ import Alert from '@/components/ui/Alert'
 import { formatRelativeTime } from '@/lib/utils'
 import { subscribeToMessages, unsubscribeFromMessages, markAllAsRead, type MessageWithSender } from '@/lib/chat/realtime'
 import { Check, CheckCheck } from 'lucide-react'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 interface MessageListProps {
   messages: MessageWithSender[]
@@ -44,7 +45,7 @@ export function MessageList({
     if (!enableRealtime) return
 
     setIsLoading(true)
-    let subscription: any = null
+    let subscription: RealtimeChannel | null = null
 
     const setupSubscription = async () => {
       try {

@@ -195,8 +195,12 @@ export function subscribeToPresence(
       const state = channel.presenceState()
       const onlineUserIds = Object.values(state)
         .flat()
-        .map((presence: any) => presence.user_id)
-        .filter((id): id is string => userIds.includes(id))
+        .map((presence) => {
+          // Supabase presence objects have a user_id property we set during tracking
+          const presenceData = presence as Record<string, unknown>
+          return typeof presenceData.user_id === 'string' ? presenceData.user_id : null
+        })
+        .filter((id): id is string => id !== null && userIds.includes(id))
 
       callback([...new Set(onlineUserIds)])
     })

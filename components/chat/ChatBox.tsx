@@ -6,6 +6,7 @@ import { MessageInput } from '@/components/requests/MessageInput'
 import { subscribeToPresence, unsubscribeFromMessages, type MessageWithSender } from '@/lib/chat/realtime'
 import { MessageSquare, Wifi, WifiOff, User } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 interface ChatBoxProps {
   requestId: string
@@ -38,7 +39,7 @@ export function ChatBox({
   useEffect(() => {
     if (!otherUserId) return
 
-    let presenceChannel: any = null
+    let presenceChannel: RealtimeChannel | null = null
 
     const setupPresence = async () => {
       try {
