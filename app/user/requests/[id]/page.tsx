@@ -5,9 +5,8 @@ import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Avatar from '@/components/ui/Avatar'
 import Alert from '@/components/ui/Alert'
-import { ArrowLeft, Calendar, Tag, AlertCircle, User, MessageSquare } from 'lucide-react'
-import { MessageList } from '@/components/requests/MessageList'
-import { MessageInput } from '@/components/requests/MessageInput'
+import { ArrowLeft, Calendar, Tag, AlertCircle, User } from 'lucide-react'
+import { ChatBox } from '@/components/chat/ChatBox'
 import { CancelRequestButton } from '@/components/requests/CancelRequestButton'
 
 const statusColors: Record<string, 'default' | 'success' | 'warning' | 'danger'> = {
@@ -215,19 +214,15 @@ export default async function RequestDetailPage({
         {/* Chat Section */}
         {showChat && (
           <Card>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              Messages
-            </h2>
-            <MessageList 
-              messages={request.messages || []} 
+            <ChatBox
+              requestId={request.id}
+              messages={request.messages || []}
               currentUserId={user.id}
+              otherUserId={request.professional_id || undefined}
+              otherUserName={request.assigned_professional?.profiles?.full_name || undefined}
+              showHeader={true}
+              isReadOnly={request.status === 'completed'}
             />
-            {request.status !== 'completed' && (
-              <div className="mt-4 pt-4 border-t">
-                <MessageInput requestId={request.id} />
-              </div>
-            )}
           </Card>
         )}
       </div>

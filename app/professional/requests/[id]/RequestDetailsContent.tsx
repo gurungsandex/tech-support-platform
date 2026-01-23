@@ -5,10 +5,9 @@ import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import Alert from '@/components/ui/Alert'
-import { MessageList } from '@/components/requests/MessageList'
-import { MessageInput } from '@/components/requests/MessageInput'
+import { ChatBox } from '@/components/chat/ChatBox'
 import { updateRequestStatus } from '@/lib/professionals/actions'
-import { Clock, Tag, AlertCircle, User, Mail, Phone } from 'lucide-react'
+import { Clock, Tag, User, Mail, Phone } from 'lucide-react'
 import type { SupportRequest, Message } from '@/lib/types/database'
 
 const statusColors: Record<string, 'default' | 'success' | 'warning' | 'danger'> = {
@@ -180,15 +179,15 @@ export function RequestDetailsContent({ request, currentUserId }: RequestDetails
           <CardTitle>Messages</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            <MessageList
-              messages={request.messages || []}
-              currentUserId={currentUserId}
-            />
-            {currentStatus !== 'completed' && (
-              <MessageInput requestId={request.id} />
-            )}
-          </div>
+          <ChatBox
+            requestId={request.id}
+            messages={request.messages || []}
+            currentUserId={currentUserId}
+            otherUserId={request.requester_id}
+            otherUserName={request.requester && request.requester.length > 0 ? request.requester[0].full_name : 'User'}
+            showHeader={false}
+            isReadOnly={currentStatus === 'completed'}
+          />
         </CardContent>
       </Card>
     </div>
