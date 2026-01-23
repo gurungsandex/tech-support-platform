@@ -17,7 +17,7 @@ export default async function RequestsPage() {
   const { data: requests, error } = await supabase
     .from('support_requests')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('requester_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) {

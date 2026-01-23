@@ -23,7 +23,7 @@ export async function createRequest(data: {
   const { data: request, error } = await supabase
     .from('support_requests')
     .insert({
-      user_id: user.id,
+      requester_id: user.id,
       title: data.title,
       description: data.description,
       category: data.category,
@@ -66,7 +66,7 @@ export async function updateRequest(id: string, data: {
       updated_at: new Date().toISOString()
     })
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('requester_id', user.id)
     .select()
     .single()
 
@@ -92,7 +92,7 @@ export async function deleteRequest(id: string) {
     .from('support_requests')
     .delete()
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('requester_id', user.id)
 
   if (error) {
     return { error: error.message }
@@ -126,7 +126,7 @@ export async function getRequests(filters?: {
         profiles(full_name, email)
       )
     `)
-    .eq('user_id', user.id)
+    .eq('requester_id', user.id)
     .order('created_at', { ascending: false })
 
   if (filters?.status) {
@@ -179,7 +179,7 @@ export async function getRequestById(id: string) {
       )
     `)
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('requester_id', user.id)
     .single()
 
   if (error) {
@@ -202,7 +202,7 @@ export async function cancelRequest(id: string) {
     .from('support_requests')
     .update({ status: 'cancelled', updated_at: new Date().toISOString() })
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('requester_id', user.id)
     .select()
     .single()
 

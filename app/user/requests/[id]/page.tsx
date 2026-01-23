@@ -59,7 +59,7 @@ export default async function RequestDetailPage({
       )
     `)
     .eq('id', params.id)
-    .eq('user_id', user.id)
+    .eq('requester_id', user.id)
     .single()
 
   if (error || !request) {
