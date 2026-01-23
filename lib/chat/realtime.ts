@@ -1,13 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import type { Message } from '@/lib/types/database'
-
-export interface MessageWithSender extends Message {
-  sender: {
-    full_name: string
-    role: string
-  } | null
-}
+import type { Message, MessageWithSender } from '@/lib/types/database'
+import { MAX_MESSAGE_LENGTH } from './constants'
 
 export type MessageCallback = (message: MessageWithSender) => void
 
@@ -82,8 +76,8 @@ export async function sendMessage(
     return { error: 'Message cannot be empty' }
   }
 
-  if (trimmedContent.length > 2000) {
-    return { error: 'Message cannot exceed 2000 characters' }
+  if (trimmedContent.length > MAX_MESSAGE_LENGTH) {
+    return { error: `Message cannot exceed ${MAX_MESSAGE_LENGTH} characters` }
   }
 
   // Insert message

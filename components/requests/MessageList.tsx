@@ -5,9 +5,10 @@ import Avatar from '@/components/ui/Avatar'
 import Spinner from '@/components/ui/Spinner'
 import Alert from '@/components/ui/Alert'
 import { formatRelativeTime } from '@/lib/utils'
-import { subscribeToMessages, unsubscribeFromMessages, markAllAsRead, type MessageWithSender } from '@/lib/chat/realtime'
+import { subscribeToMessages, unsubscribeFromMessages, markAllAsRead } from '@/lib/chat/realtime'
 import { Check, CheckCheck } from 'lucide-react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import type { MessageWithSender } from '@/lib/types/database'
 
 interface MessageListProps {
   messages: MessageWithSender[]

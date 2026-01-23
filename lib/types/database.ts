@@ -59,6 +59,13 @@ export interface Message {
   created_at: string;
 }
 
+export interface MessageWithSender extends Message {
+  sender: {
+    full_name: string
+    role: string
+  } | null
+}
+
 export interface Review {
   id: string;
   request_id: string;

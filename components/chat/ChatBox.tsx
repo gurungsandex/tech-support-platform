@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react'
 import { MessageList } from '@/components/requests/MessageList'
 import { MessageInput } from '@/components/requests/MessageInput'
-import { subscribeToPresence, unsubscribeFromMessages, type MessageWithSender } from '@/lib/chat/realtime'
+import { subscribeToPresence, unsubscribeFromMessages } from '@/lib/chat/realtime'
 import { MessageSquare, Wifi, WifiOff, User } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import type { MessageWithSender } from '@/lib/types/database'
+import type { ConnectionStatus } from '@/lib/chat/constants'
 
 interface ChatBoxProps {
   requestId: string
@@ -14,7 +16,7 @@ interface ChatBoxProps {
   currentUserId: string
   otherUserId?: string
   otherUserName?: string
-  status?: 'connected' | 'disconnected' | 'connecting'
+  status?: ConnectionStatus
   showHeader?: boolean
   isReadOnly?: boolean
 }
@@ -29,7 +31,7 @@ export function ChatBox({
   showHeader = true,
   isReadOnly = false
 }: ChatBoxProps) {
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'connecting'>(initialStatus)
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(initialStatus)
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
   const [isTyping, setIsTyping] = useState(false)
 

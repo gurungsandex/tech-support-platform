@@ -6,13 +6,12 @@ import Textarea from '@/components/ui/Textarea'
 import Alert from '@/components/ui/Alert'
 import { Send } from 'lucide-react'
 import { sendMessage } from '@/lib/chat/realtime'
+import { MAX_MESSAGE_LENGTH, MESSAGE_WARNING_THRESHOLD } from '@/lib/chat/constants'
 
 interface MessageInputProps {
   requestId: string
   onMessageSent?: () => void
 }
-
-const MAX_CHARS = 2000
 
 export function MessageInput({ requestId, onMessageSent }: MessageInputProps) {
   const [content, setContent] = useState('')
@@ -58,7 +57,7 @@ export function MessageInput({ requestId, onMessageSent }: MessageInputProps) {
     }
   }
 
-  const remainingChars = MAX_CHARS - content.length
+  const remainingChars = MAX_MESSAGE_LENGTH - content.length
   const isOverLimit = remainingChars < 0
 
   return (
@@ -82,10 +81,10 @@ export function MessageInput({ requestId, onMessageSent }: MessageInputProps) {
         />
         <div className={`absolute bottom-2 right-2 text-xs ${
           isOverLimit ? 'text-red-600' : 
-          remainingChars < 100 ? 'text-orange-600' : 
+          remainingChars < MESSAGE_WARNING_THRESHOLD ? 'text-orange-600' : 
           'text-gray-400'
         }`}>
-          {remainingChars} / {MAX_CHARS}
+          {remainingChars} / {MAX_MESSAGE_LENGTH}
         </div>
       </div>
       

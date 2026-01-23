@@ -8,7 +8,8 @@ import Alert from '@/components/ui/Alert'
 import { ChatBox } from '@/components/chat/ChatBox'
 import { updateRequestStatus } from '@/lib/professionals/actions'
 import { Clock, Tag, User, Mail, Phone } from 'lucide-react'
-import type { SupportRequest, Message } from '@/lib/types/database'
+import type { SupportRequest } from '@/lib/types/database'
+import type { MessageWithSender } from '@/lib/types/database'
 
 const statusColors: Record<string, 'default' | 'success' | 'warning' | 'danger'> = {
   accepted: 'warning',
@@ -21,13 +22,6 @@ const urgencyColors: Record<string, 'default' | 'success' | 'warning' | 'danger'
   medium: 'default',
   high: 'warning',
   critical: 'danger'
-}
-
-interface MessageWithSender extends Message {
-  sender: {
-    full_name: string
-    role: string
-  } | null
 }
 
 interface RequestWithDetails extends SupportRequest {
