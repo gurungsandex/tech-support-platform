@@ -77,7 +77,7 @@ export function RequestCard({ request }: RequestCardProps) {
 
         <div className="flex sm:flex-col gap-2">
           <Link href={`/user/requests/${request.id}`} className="flex-1 sm:flex-initial">
-            <Button variant="outline"  className="w-full">
+            <Button variant="outline" className="w-full">
               View Details
             </Button>
           </Link>

@@ -41,7 +41,6 @@ export function CancelRequestButton({ requestId }: CancelRequestButtonProps) {
     return (
       <Button
         variant="outline"
-        
         onClick={() => setShowConfirm(true)}
       >
         <XCircle className="w-4 h-4 mr-2" />
@@ -63,7 +62,6 @@ export function CancelRequestButton({ requestId }: CancelRequestButtonProps) {
       <div className="flex gap-2">
         <Button
           variant="outline"
-          
           onClick={handleCancel}
           disabled={loading}
           className="bg-red-600 text-white hover:bg-red-700 border-red-600"
@@ -72,7 +70,6 @@ export function CancelRequestButton({ requestId }: CancelRequestButtonProps) {
         </Button>
         <Button
           variant="outline"
-          
           onClick={() => setShowConfirm(false)}
           disabled={loading}
         >

@@ -37,7 +37,6 @@ export function MessageList({ messages, currentUserId }: MessageListProps) {
     <div className="space-y-4">
       {messages.map((message) => {
         const isOwnMessage = message.sender_id === currentUserId
-        
         return (
           <div
             key={message.id}
@@ -45,7 +44,6 @@ export function MessageList({ messages, currentUserId }: MessageListProps) {
           >
             <Avatar
               name={message.sender?.full_name || 'User'}
-              
             />
             <div className={`flex-1 max-w-xl ${isOwnMessage ? 'items-end' : 'items-start'} flex flex-col`}>
               <div className="flex items-baseline gap-2 mb-1">
