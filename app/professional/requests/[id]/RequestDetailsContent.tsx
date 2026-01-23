@@ -70,6 +70,7 @@ export function RequestDetailsContent({ request, currentUserId }: RequestDetails
       setError(result.error)
     } else {
       setCurrentStatus(newStatus)
+      // Note: completed_requests count is incremented by database trigger
     }
     setIsUpdating(false)
   }

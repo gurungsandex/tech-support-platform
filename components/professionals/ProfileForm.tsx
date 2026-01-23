@@ -29,9 +29,17 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     setError(null)
     setSuccess(false)
 
+    // Validate years of experience
+    const yearsOfExperience = Number(formData.years_of_experience)
+    if (isNaN(yearsOfExperience) || yearsOfExperience < 0) {
+      setError('Please enter a valid number for years of experience')
+      setIsLoading(false)
+      return
+    }
+
     const result = await updateProfessionalProfile({
       bio: formData.bio,
-      years_of_experience: Number(formData.years_of_experience),
+      years_of_experience: yearsOfExperience,
       specialization: formData.specialization
         .split(',')
         .map(s => s.trim())

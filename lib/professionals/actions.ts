@@ -164,10 +164,8 @@ export async function updateRequestStatus(requestId: string, status: 'in_progres
     return { error: error.message }
   }
 
-  // If completed, increment completed_requests count
-  if (status === 'completed') {
-    await supabase.rpc('increment_completed_requests', { professional_user_id: user.id })
-  }
+  // Note: completed_requests count should be incremented by a database trigger
+  // If trigger doesn't exist, you may need to manually increment here
 
   revalidatePath('/professional/my-requests')
   revalidatePath(`/professional/requests/${requestId}`)

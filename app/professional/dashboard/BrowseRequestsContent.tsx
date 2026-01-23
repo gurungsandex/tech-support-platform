@@ -168,8 +168,11 @@ export function BrowseRequestsContent() {
                     <div className="flex items-center gap-1">
                       <User className="w-4 h-4" />
                       <span className="text-gray-400">
-                        {request.requester && request.requester.length > 0 ? 
-                          `${request.requester[0].full_name.split(' ')[0]} ${request.requester[0].full_name.split(' ').slice(1).map(() => '*').join('')}` : 
+                        {request.requester && request.requester.length > 0 && request.requester[0].full_name ? 
+                          (() => {
+                            const nameParts = request.requester[0].full_name.split(' ')
+                            return `${nameParts[0]} ${nameParts.slice(1).map(() => '*').join('')}`
+                          })() : 
                           'Anonymous'}
                       </span>
                     </div>
