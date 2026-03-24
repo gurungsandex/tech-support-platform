@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import Avatar from '@/components/ui/Avatar'
-import { FileText, PlusCircle, User, LogOut } from 'lucide-react'
+import { Search, MessageSquare, User, LogOut, FileText } from 'lucide-react'
 import { signOut } from '@/lib/auth/flows'
 
 export default async function UserLayout({
@@ -28,8 +28,9 @@ export default async function UserLayout({
   }
 
   const navItems = [
-    { href: '/user/requests', label: 'Requests', icon: FileText },
-    { href: '/user/requests/new', label: 'New Request', icon: PlusCircle },
+    { href: '/find-technicians', label: 'Find Technicians', icon: Search },
+    { href: '/user/conversations', label: 'Messages', icon: MessageSquare },
+    { href: '/user/requests', label: 'My Requests', icon: FileText },
     { href: '/user/profile', label: 'Profile', icon: User },
   ]
 

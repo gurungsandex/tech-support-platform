@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import Avatar from '@/components/ui/Avatar'
 import { VerificationBadge } from '@/components/professionals/VerificationBadge'
-import { LayoutDashboard, Briefcase, User, LogOut } from 'lucide-react'
+import { LayoutDashboard, User, LogOut, MessageSquare, Search } from 'lucide-react'
 import { signOut } from '@/lib/auth/flows'
 import { getProfessionalStats } from '@/lib/professionals/actions'
 
@@ -39,9 +39,10 @@ export default async function ProfessionalLayout({
   const stats = statsResult.data
 
   const navItems = [
-    { href: '/professional/dashboard', label: 'Browse Requests', icon: LayoutDashboard },
-    { href: '/professional/my-requests', label: 'My Requests', icon: Briefcase },
-    { href: '/professional/profile', label: 'Profile', icon: User },
+    { href: '/find-technicians', label: 'Directory', icon: Search },
+    { href: '/professional/conversations', label: 'Messages', icon: MessageSquare },
+    { href: '/professional/dashboard', label: 'Requests', icon: LayoutDashboard },
+    { href: '/professional/profile', label: 'My Profile', icon: User },
   ]
 
   return (
