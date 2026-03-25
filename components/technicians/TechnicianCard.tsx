@@ -1,7 +1,7 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { MapPin, Star, Wifi, Home, Monitor, CheckCircle } from 'lucide-react'
 import type { TechnicianSearchResult } from '@/lib/types/database'
-import Badge from '@/components/ui/Badge'
 
 interface Props {
   technician: TechnicianSearchResult
@@ -20,9 +20,11 @@ export default function TechnicianCard({ technician }: Props) {
         <div className="relative flex-shrink-0">
           <div className="h-14 w-14 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
             {technician.profile_photo_url ? (
-              <img
+              <Image
                 src={technician.profile_photo_url}
                 alt={technician.full_name}
+                width={56}
+                height={56}
                 className="h-full w-full object-cover"
               />
             ) : (

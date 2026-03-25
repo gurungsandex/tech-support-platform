@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getMyConversations } from '@/lib/conversations/actions'
 import { MessageSquare, Clock, CheckCircle } from 'lucide-react'
@@ -38,7 +39,7 @@ export default async function TechnicianConversationsPage() {
                 className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-4 hover:border-blue-300 hover:shadow-sm transition-all">
                 <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                   {customer?.avatar_url ? (
-                    <img src={customer.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
+                    <Image src={customer.avatar_url} alt="" width={48} height={48} className="h-full w-full rounded-full object-cover" />
                   ) : (
                     <span className="text-lg font-semibold text-gray-500">
                       {customer?.full_name?.[0]?.toUpperCase() ?? '?'}

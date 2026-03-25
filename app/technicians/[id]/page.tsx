@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { getTechnicianPublicProfile } from '@/lib/technicians/actions'
@@ -7,10 +8,9 @@ import { getOrCreateConversation } from '@/lib/conversations/actions'
 import { createClient } from '@/lib/supabase/server'
 import {
   MapPin, Star, Wifi, Home, Monitor, CheckCircle, Phone,
-  Mail, MessageSquare, ExternalLink, Award, Briefcase, Calendar,
-  Clock, DollarSign, Globe, Linkedin, AlertCircle
+  Mail, MessageSquare, ExternalLink, Award, Calendar,
+  DollarSign, Globe, Linkedin, AlertCircle
 } from 'lucide-react'
-import Button from '@/components/ui/Button'
 
 export default async function TechnicianProfilePage({ params }: { params: { id: string } }) {
   const { data: tech, error } = await getTechnicianPublicProfile(params.id)
@@ -54,7 +54,7 @@ export default async function TechnicianProfilePage({ params }: { params: { id: 
                   <div className="relative">
                     <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-4 border-white shadow">
                       {tech.profile_photo_url ? (
-                        <img src={tech.profile_photo_url} alt={tech.full_name} className="h-full w-full object-cover" />
+                        <Image src={tech.profile_photo_url} alt={tech.full_name} width={96} height={96} className="h-full w-full object-cover" />
                       ) : (
                         <Monitor className="h-12 w-12 text-gray-400" />
                       )}
@@ -283,7 +283,7 @@ export default async function TechnicianProfilePage({ params }: { params: { id: 
                     {tech.portfolio.map((item) => (
                       <div key={item.id} className="rounded-lg border border-gray-100 overflow-hidden">
                         {item.image_url && (
-                          <img src={item.image_url} alt={item.title} className="w-full h-32 object-cover" />
+                          <Image src={item.image_url} alt={item.title} width={400} height={128} className="w-full h-32 object-cover" />
                         )}
                         <div className="p-3">
                           <h3 className="font-medium text-gray-900 text-sm">{item.title}</h3>

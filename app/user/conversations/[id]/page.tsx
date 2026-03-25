@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   getConversation, getConversationMessages, sendConversationMessage, submitConversationReview
 } from '@/lib/conversations/actions'
@@ -15,7 +16,6 @@ import { Send, ArrowLeft, Star, Monitor, CheckCircle, AlertCircle } from 'lucide
 
 export default function UserConversationPage() {
   const params = useParams()
-  const router = useRouter()
   const conversationId = params.id as string
 
   const [conversation, setConversation] = useState<ConversationWithDetails | null>(null)
@@ -134,7 +134,7 @@ export default function UserConversationPage() {
         <div className="relative flex-shrink-0">
           <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
             {techProfile?.profile_photo_url
-              ? <img src={techProfile.profile_photo_url} alt="" className="h-full w-full object-cover" />
+              ? <Image src={techProfile.profile_photo_url} alt="" width={40} height={40} className="h-full w-full object-cover" />
               : <Monitor className="h-5 w-5 text-gray-400" />}
           </div>
           <span className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />

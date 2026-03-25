@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getMyConversations } from '@/lib/conversations/actions'
 import { MessageSquare, Clock, CheckCircle } from 'lucide-react'
@@ -42,7 +43,7 @@ export default async function UserConversationsPage() {
                 <div className="relative flex-shrink-0">
                   <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                     {techProfile?.profile_photo_url ? (
-                      <img src={techProfile.profile_photo_url} alt="" className="h-full w-full object-cover" />
+                      <Image src={techProfile.profile_photo_url} alt="" width={48} height={48} className="h-full w-full object-cover" />
                     ) : (
                       <span className="text-lg font-semibold text-gray-500">
                         {tech?.full_name?.[0]?.toUpperCase() ?? '?'}
