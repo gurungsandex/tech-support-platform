@@ -9,12 +9,14 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center space-x-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-                <span className="text-sm font-bold text-white">TS</span>
+                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
-              <span className="text-lg font-bold text-gray-900">TechSupport</span>
+              <span className="text-lg font-bold text-gray-900">TechLink</span>
             </div>
             <p className="mt-4 text-sm text-gray-500">
-              Connecting customers with independent IT professionals. No middleman. No platform fees. United States only.
+              Connecting customers with independent IT professionals worldwide. No middleman. No platform fees.
             </p>
           </div>
 
@@ -57,7 +59,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-gray-900">About</h3>
             <ul className="mt-4 space-y-3">
-              <li className="text-sm text-gray-500">🇺🇸 United States Only</li>
+              <li className="text-sm text-gray-500">🌍 Available Worldwide</li>
               <li className="text-sm text-gray-500">✅ Free to Browse</li>
               <li className="text-sm text-gray-500">🚫 No Platform Fees</li>
               <li className="text-sm text-gray-500">💬 Direct Contact</li>
@@ -67,7 +69,7 @@ export default function Footer() {
 
         <div className="mt-8 border-t border-gray-200 pt-8">
           <p className="text-center text-sm text-gray-400">
-            © {new Date().getFullYear()} TechSupport Platform. All rights reserved. &nbsp;·&nbsp;
+            © {new Date().getFullYear()} TechLink. All rights reserved. &nbsp;·&nbsp;
             <Link href="/disclaimer" className="hover:text-blue-600">Disclaimer</Link>
             &nbsp;·&nbsp;
             <Link href="/privacy" className="hover:text-blue-600">Privacy</Link>

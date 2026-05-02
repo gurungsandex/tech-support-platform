@@ -1,30 +1,67 @@
-'use client'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { AdminSidebar } from './AdminSidebar'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, UserCheck, Flag, Users, LogOut } from 'lucide-react'
-import { signOut } from '@/lib/auth/flows'
-import Button from '@/components/ui/Button'
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const nav = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Approve Professionals', href: '/admin/approve-professionals', icon: UserCheck },
-    { name: 'Reports', href: '/admin/reports', icon: Flag },
-    { name: 'Users', href: '/admin/users', icon: Users },
-  ]
+  if (error || !user) {
+    redirect('/login')
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, full_name, email')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile || profile.role !== 'admin') {
+    redirect('/')
+  }
+
+  const initials = profile.full_name
+    ? profile.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'A'
 
   return (
-    <div className="flex h-screen bg-secondary-50">
-      <aside className="hidden w-64 border-r bg-white md:block">
-        <div className="flex h-full flex-col">
-          <div className="border-b p-4"><Link href="/"><div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600"><span className="text-lg font-bold text-white">TS</span></div></Link></div>
-          <nav className="flex-1 space-y-1 p-4">{nav.map((item) => <Link key={item.name} href={item.href} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm ${pathname === item.href ? 'bg-primary-50 text-primary-600' : 'text-secondary-700'}`}><item.icon className="h-5 w-5" />{item.name}</Link>)}</nav>
-          <div className="border-t p-4"><Button variant="ghost" className="w-full justify-start" onClick={() => signOut()}><LogOut className="mr-3 h-5 w-5" />Sign Out</Button></div>
+    <div className="flex h-screen bg-gray-50">
+      <AdminSidebar />
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Top bar */}
+        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+          <div className="w-72">
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+              {initials}
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 overflow-y-auto p-6">
+          {children}
+        </main>
+        {/* Bottom user strip */}
+        <div className="border-t border-gray-100 bg-white px-5 py-3 flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+            {initials}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="truncate text-sm font-medium text-gray-900">{profile.full_name || 'Admin User'}</p>
+            <p className="truncate text-xs text-gray-500">Administrator</p>
+          </div>
         </div>
-      </aside>
-      <main className="flex-1 overflow-y-auto"><div className="mx-auto max-w-7xl p-6">{children}</div></main>
+      </div>
     </div>
   )
 }

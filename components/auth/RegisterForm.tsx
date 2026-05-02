@@ -76,9 +76,6 @@ export default function RegisterForm() {
         setError(result.error)
       } else {
         setSuccess(true)
-        setTimeout(() => {
-          router.push('/login')
-        }, 2000)
       }
     } catch (err) {
       setError('An unexpected error occurred')
@@ -105,8 +102,9 @@ export default function RegisterForm() {
       )}
 
       {success && (
-        <Alert variant="success" title="Registration Successful">
-          Account created successfully! Redirecting to login...
+        <Alert variant="success" title="Account Created!">
+          Check your email for a confirmation link, then{' '}
+          <a href="/login" className="underline font-medium">sign in here</a>.
         </Alert>
       )}
 

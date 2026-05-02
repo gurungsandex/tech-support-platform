@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Star, Wifi, Home, Monitor, CheckCircle } from 'lucide-react'
+import { MapPin, Star, CheckCircle, MessageSquare } from 'lucide-react'
 import type { TechnicianSearchResult } from '@/lib/types/database'
 
 interface Props {
@@ -10,15 +10,17 @@ interface Props {
 export default function TechnicianCard({ technician }: Props) {
   const isOnline = technician.availability_status === 'online'
 
+  const tags: string[] = []
+  if (technician.support_type === 'remote' || technician.support_type === 'both') tags.push('Remote')
+  if (technician.support_type === 'onsite' || technician.support_type === 'both') tags.push('On-site')
+  if (technician.verification_status === 'approved') tags.push('Verified')
+
   return (
-    <Link
-      href={`/technicians/${technician.user_id}`}
-      className="block rounded-xl border border-gray-200 bg-white p-5 hover:border-blue-300 hover:shadow-md transition-all"
-    >
-      <div className="flex items-start gap-4">
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-start gap-4 mb-4">
         {/* Avatar */}
         <div className="relative flex-shrink-0">
-          <div className="h-14 w-14 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+          <div className="h-14 w-14 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-100">
             {technician.profile_photo_url ? (
               <Image
                 src={technician.profile_photo_url}
@@ -28,88 +30,85 @@ export default function TechnicianCard({ technician }: Props) {
                 className="h-full w-full object-cover"
               />
             ) : (
-              <Monitor className="h-7 w-7 text-gray-400" />
+              <span className="text-xl font-bold text-gray-400">
+                {technician.full_name?.[0]?.toUpperCase() ?? '?'}
+              </span>
             )}
           </div>
-          {/* Online indicator */}
           <span
-            className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+            className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-300'}`}
           />
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <h3 className="font-semibold text-gray-900 truncate">{technician.full_name}</h3>
-              {technician.tagline && (
-                <p className="text-sm text-gray-500 truncate mt-0.5">{technician.tagline}</p>
-              )}
-            </div>
-            <span
-              className={`flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${
-                isOnline ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-              }`}
-            >
-              {isOnline ? 'Online' : 'Offline'}
-            </span>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <h3 className="font-semibold text-gray-900 truncate">{technician.full_name}</h3>
+            {technician.verification_status === 'approved' && (
+              <CheckCircle className="h-4 w-4 text-blue-500 flex-shrink-0" />
+            )}
           </div>
-
-          {/* Location */}
-          {(technician.city || technician.state) && (
-            <div className="mt-1.5 flex items-center gap-1 text-xs text-gray-500">
-              <MapPin className="h-3 w-3" />
-              <span>
-                {[technician.city, technician.state].filter(Boolean).join(', ')}
-                {technician.distance_miles !== null && technician.distance_miles !== undefined && (
-                  <span className="ml-1 text-blue-600 font-medium">
-                    · {technician.distance_miles.toFixed(1)} mi away
-                  </span>
-                )}
-              </span>
-            </div>
+          {technician.tagline && (
+            <p className="text-sm text-gray-500 truncate">{technician.tagline}</p>
           )}
 
-          {/* Rating */}
-          <div className="mt-1.5 flex items-center gap-1">
+          {/* Rating + distance */}
+          <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-500">
             {technician.average_rating > 0 ? (
               <>
                 <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
-                <span className="text-xs font-medium text-gray-700">
-                  {technician.average_rating.toFixed(1)}
-                </span>
-                <span className="text-xs text-gray-400">({technician.total_reviews} reviews)</span>
+                <span className="font-medium text-gray-700">{technician.average_rating.toFixed(1)}</span>
+                <span>({technician.total_reviews})</span>
               </>
             ) : (
-              <span className="text-xs text-gray-400">No reviews yet</span>
+              <span className="text-gray-400">No reviews yet</span>
             )}
-            {technician.completed_requests > 0 && (
-              <span className="ml-2 text-xs text-gray-400">
-                · {technician.completed_requests} jobs done
-              </span>
+            {technician.distance_miles !== null && technician.distance_miles !== undefined && (
+              <>
+                <span className="text-gray-300">·</span>
+                <MapPin className="h-3 w-3" />
+                <span>{technician.distance_miles.toFixed(1)} km away</span>
+              </>
             )}
-          </div>
-
-          {/* Support type badges */}
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {(technician.support_type === 'remote' || technician.support_type === 'both') && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
-                <Wifi className="h-3 w-3" /> Remote
-              </span>
-            )}
-            {(technician.support_type === 'onsite' || technician.support_type === 'both') && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2 py-0.5 text-xs text-purple-700">
-                <Home className="h-3 w-3" /> On-site {technician.service_radius_miles ? `(${technician.service_radius_miles}mi)` : ''}
-              </span>
-            )}
-            {technician.verification_status === 'approved' && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
-                <CheckCircle className="h-3 w-3" /> Verified
-              </span>
+            {(technician.city || technician.state) && !technician.distance_miles && (
+              <>
+                <span className="text-gray-300">·</span>
+                <MapPin className="h-3 w-3" />
+                <span>{[technician.city, technician.state].filter(Boolean).join(', ')}</span>
+              </>
             )}
           </div>
         </div>
       </div>
-    </Link>
+
+      {/* Tags */}
+      {tags.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Action buttons */}
+      <div className="flex gap-2">
+        <Link href={`/user/conversations?tech=${technician.user_id}`} className="flex-1">
+          <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+            <MessageSquare className="h-4 w-4" />
+            Message
+          </button>
+        </Link>
+        <Link href={`/technicians/${technician.user_id}`} className="flex-1">
+          <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            View Profile
+          </button>
+        </Link>
+      </div>
+    </div>
   )
 }

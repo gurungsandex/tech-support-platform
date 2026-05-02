@@ -110,8 +110,8 @@ export default function TermsPage() {
               <section>
                 <h2 className="text-lg font-semibold text-gray-900">10. Governing Law</h2>
                 <p>
-                  These terms are governed by the laws of the United States. Any disputes shall be resolved
-                  through binding arbitration, not class action lawsuits.
+                  These terms are governed by applicable law. Any disputes shall be resolved
+                  through binding arbitration in the jurisdiction agreed upon by both parties.
                 </p>
               </section>
 

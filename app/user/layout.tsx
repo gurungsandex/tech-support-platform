@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import Avatar from '@/components/ui/Avatar'
-import { Search, MessageSquare, User, LogOut, FileText } from 'lucide-react'
+import { Search, MessageSquare, User, LogOut, Briefcase, Star, LayoutDashboard } from 'lucide-react'
 import { signOut } from '@/lib/auth/flows'
 
 export default async function UserLayout({
@@ -27,92 +26,109 @@ export default async function UserLayout({
     redirect('/login')
   }
 
+  const initials = profile.full_name
+    ? profile.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'U'
+
   const navItems = [
-    { href: '/find-technicians', label: 'Find Technicians', icon: Search },
-    { href: '/user/conversations', label: 'Messages', icon: MessageSquare },
-    { href: '/user/requests', label: 'My Requests', icon: FileText },
+    { href: '/user/requests', label: 'Overview', icon: LayoutDashboard },
+    { href: '/user/conversations', label: 'Messages', icon: MessageSquare, badge: 3 },
+    { href: '/user/requests', label: 'My Jobs', icon: Briefcase },
+    { href: '/user/reviews', label: 'Reviews Given', icon: Star },
     { href: '/user/profile', label: 'Profile', icon: User },
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="hidden md:flex md:flex-shrink-0">
-          <div className="flex flex-col w-64 bg-white border-r border-gray-200">
-            <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-              <div className="flex items-center flex-shrink-0 px-4 mb-6">
-                <h1 className="text-xl font-bold text-gray-900">User Dashboard</h1>
-              </div>
-
-              {/* User Profile Card */}
-              <div className="px-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar
-                      name={profile.full_name || profile.email}
-                      size="md"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {profile.full_name || 'User'}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {profile.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Navigation */}
-              <nav className="flex-1 px-2 space-y-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-                  >
-                    <item.icon className="mr-3 h-5 w-5 text-gray-500 group-hover:text-gray-700" />
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-
-              {/* Sign Out */}
-              <div className="px-2 mt-4">
-                <form action={signOut}>
-                  <button
-                    type="submit"
-                    className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-red-700 hover:text-red-900 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut className="mr-3 h-5 w-5" />
-                    Sign Out
-                  </button>
-                </form>
-              </div>
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 bg-white border-r border-gray-200">
+        {/* Logo */}
+        <div className="flex h-16 items-center border-b border-gray-100 px-5">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             </div>
-          </div>
-        </aside>
-
-        {/* Mobile Navigation */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
-          <nav className="flex justify-around">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex flex-col items-center py-2 px-3 text-xs font-medium text-gray-700 hover:text-gray-900"
-              >
-                <item.icon className="h-6 w-6 mb-1" />
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+            <span className="text-base font-bold text-gray-900">TechLink</span>
+          </Link>
         </div>
 
-        {/* Main Content */}
-        <main className="flex-1">
+        {/* Portal label */}
+        <div className="px-5 pt-4 pb-2">
+          <span className="inline-flex items-center rounded-md bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+            User Portal
+          </span>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 space-y-0.5 px-3 pt-2 overflow-y-auto">
+          {navItems.map((item) => (
+            <Link
+              key={`${item.href}-${item.label}`}
+              href={item.href}
+              className="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className="h-4 w-4 text-gray-400 group-hover:text-gray-600" style={{ width: '1.125rem', height: '1.125rem' }} />
+                {item.label}
+              </div>
+              {item.badge && item.badge > 0 ? (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-xs font-semibold text-white">
+                  {item.badge}
+                </span>
+              ) : null}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Sign Out */}
+        <div className="px-3 pb-3">
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </button>
+          </form>
+        </div>
+
+        {/* Bottom user strip */}
+        <div className="border-t border-gray-100 px-4 py-3 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white flex-shrink-0">
+            {initials}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="truncate text-sm font-semibold text-gray-900">{profile.full_name || 'User'}</p>
+            <p className="truncate text-xs text-gray-400">End User</p>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile bottom nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+        <nav className="flex justify-around py-1">
+          {navItems.slice(0, 5).map((item) => (
+            <Link
+              key={`${item.href}-${item.label}`}
+              href={item.href}
+              className="flex flex-col items-center py-2 px-3 text-xs font-medium text-gray-600 hover:text-blue-600 relative"
+            >
+              <item.icon className="h-5 w-5 mb-1" />
+              {item.label}
+              {item.badge && item.badge > 0 ? (
+                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                  {item.badge}
+                </span>
+              ) : null}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      {/* Main content */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <main className="flex-1 overflow-y-auto">
           <div className="py-6 px-4 sm:px-6 lg:px-8 pb-20 md:pb-6">
             {children}
           </div>

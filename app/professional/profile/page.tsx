@@ -361,7 +361,7 @@ export default function TechnicianProfileEditor() {
           </div>
 
           <div className="rounded-xl bg-white border border-gray-200 p-6 space-y-4">
-            <h2 className="font-semibold text-gray-900 flex items-center gap-2"><MapPin className="h-4 w-4" /> Location (US Only)</h2>
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2"><MapPin className="h-4 w-4" /> Location</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">City</label>

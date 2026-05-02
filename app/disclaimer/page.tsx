@@ -92,8 +92,8 @@ export default function DisclaimerPage() {
               <section>
                 <h2 className="text-lg font-semibold text-gray-900">7. Geographic Scope</h2>
                 <p>
-                  This platform is intended for use within the <strong>United States only</strong>. Users outside
-                  the United States are not the intended audience and use this platform at their own risk.
+                  This platform is available for use globally. Users are responsible for ensuring their use of the platform
+                  complies with the laws and regulations of their local jurisdiction.
                 </p>
               </section>
 
