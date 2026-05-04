@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import HeroSearch from '@/components/layout/HeroSearch'
+import { createClient } from '@/lib/supabase/server'
 import {
   Search, MapPin, MessageSquare, Star, Shield, Users,
   Wifi, Monitor, Printer, Network, Database, Cloud,
@@ -37,7 +38,14 @@ const steps = [
   },
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient()
+  const { data: topTechs } = await supabase
+    .from('it_professional_profiles')
+    .select('user_id, average_rating, total_reviews, availability_status, tagline, profile:profiles!it_professional_profiles_user_id_fkey(full_name)')
+    .eq('verification_status', 'approved')
+    .order('average_rating', { ascending: false })
+    .limit(4)
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -123,35 +131,45 @@ export default function HomePage() {
                 View all experts <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { name: 'Alex Martinez', role: 'Network Specialist', rating: 4.9, reviews: 127, online: true },
-                { name: 'Sarah Jenkins', role: 'Hardware Specialist', rating: 5.0, reviews: 84, online: true },
-                { name: 'David Chen', role: 'Data Recovery Expert', rating: 4.8, reviews: 203, online: false },
-                { name: 'Michael Ross', role: 'Cloud Architect', rating: 4.9, reviews: 156, online: true },
-              ].map((tech) => (
-                <div key={tech.name} className="rounded-2xl bg-white border border-gray-100 p-5 text-center shadow-sm hover:shadow-md transition-shadow">
-                  <div className="relative inline-block mb-3">
-                    <div className="h-16 w-16 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold text-white mx-auto">
-                      {tech.name[0]}
+            {topTechs && topTechs.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {topTechs.map((tech: any) => {
+                  const name = tech.profile?.full_name ?? 'Technician'
+                  const isOnline = tech.availability_status === 'online'
+                  return (
+                    <div key={tech.user_id} className="rounded-2xl bg-white border border-gray-100 p-5 text-center shadow-sm hover:shadow-md transition-shadow">
+                      <div className="relative inline-block mb-3">
+                        <div className="h-16 w-16 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold text-white mx-auto">
+                          {name[0]?.toUpperCase()}
+                        </div>
+                        <span className={`absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-300'}`} />
+                      </div>
+                      <p className="font-semibold text-gray-900 text-sm">{name}</p>
+                      {tech.tagline && <p className="text-xs text-gray-500 mt-0.5 mb-2 line-clamp-1">{tech.tagline}</p>}
+                      {tech.average_rating > 0 && (
+                        <div className="flex items-center justify-center gap-1 mb-3">
+                          <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
+                          <span className="text-xs font-semibold text-gray-700">{tech.average_rating.toFixed(1)}</span>
+                          <span className="text-xs text-gray-400">({tech.total_reviews})</span>
+                        </div>
+                      )}
+                      <Link href={`/technicians/${tech.user_id}`}>
+                        <button className="w-full rounded-xl border border-gray-200 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                          View Profile
+                        </button>
+                      </Link>
                     </div>
-                    <span className={`absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white ${tech.online ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  </div>
-                  <p className="font-semibold text-gray-900 text-sm">{tech.name}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 mb-2">{tech.role}</p>
-                  <div className="flex items-center justify-center gap-1 mb-3">
-                    <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
-                    <span className="text-xs font-semibold text-gray-700">{tech.rating}</span>
-                    <span className="text-xs text-gray-400">({tech.reviews})</span>
-                  </div>
-                  <Link href="/find-technicians">
-                    <button className="w-full rounded-xl border border-gray-200 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-                      Message
-                    </button>
-                  </Link>
-                </div>
-              ))}
-            </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="rounded-2xl bg-white border border-gray-100 py-12 text-center">
+                <p className="text-sm text-gray-400">Technicians will appear here once approved.</p>
+                <Link href="/find-technicians" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700">
+                  Browse all <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 

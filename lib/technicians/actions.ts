@@ -25,9 +25,9 @@ export interface SearchParams {
 // Geocode a ZIP code or city using Nominatim (free OpenStreetMap service)
 export async function geocodeLocation(query: string): Promise<{ lat: number; lng: number } | null> {
   try {
-    const encoded = encodeURIComponent(`${query}, United States`)
+    const encoded = encodeURIComponent(query)
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1&countrycodes=us`,
+      `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`,
       {
         headers: { 'User-Agent': 'TechSupportPlatform/1.0' },
         next: { revalidate: 3600 },
