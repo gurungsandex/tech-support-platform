@@ -1,9 +1,17 @@
 import type { Metadata } from 'next'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-jakarta',
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
-  title: 'Tech Support Platform - Connect with Verified IT Professionals',
-  description: 'A secure, privacy-first platform connecting end users with verified IT professionals for real-time technical support.',
+  title: 'TechLink - Connect with Verified IT Professionals',
+  description: 'Find trusted local IT professionals for networking, hardware, software, and security. Browse profiles, read reviews, message directly — no fees, no middlemen.',
 }
 
 export default function RootLayout({
@@ -12,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={jakarta.variable}>
       <body className="font-sans">{children}</body>
     </html>
   )

@@ -2,22 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --font-inter: 'Inter', system-ui, sans-serif;
-  }
+/* ─────────────────────────────────────────────────────────────
+   Wirelink Design Tokens — CSS custom properties
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* Brand — orange primary */
+  --wl-primary-50:  #fff7ed;
+  --wl-primary-100: #ffedd5;
+  --wl-primary-200: #fed7aa;
+  --wl-primary-300: #fdba74;
+  --wl-primary-400: #fb923c;
+  --wl-primary-500: #f97316;
+  --wl-primary-600: #ea580c;
+  --wl-primary-700: #c2410c;
+  --wl-primary-800: #9a3412;
+  --wl-primary-900: #7c2d12;
 
+  /* Neutrals — slate */
+  --wl-ink-950: #020617;
+  --wl-ink-900: #0f172a;
+  --wl-ink-800: #1e293b;
+  --wl-ink-700: #334155;
+  --wl-ink-600: #475569;
+  --wl-ink-500: #64748b;
+  --wl-ink-400: #94a3b8;
+  --wl-ink-300: #cbd5e1;
+  --wl-ink-200: #e2e8f0;
+  --wl-ink-100: #f1f5f9;
+  --wl-ink-50:  #f8fafc;
+
+  /* Surfaces */
+  --wl-surface:       #ffffff;
+  --wl-surface-warm:  #fffaf3;
+  --wl-surface-muted: #f8fafc;
+  --wl-surface-inset: #f1f5f9;
+
+  /* Semantic */
+  --wl-success-50:  #ecfdf5;
+  --wl-success-500: #10b981;
+  --wl-success-700: #047857;
+  --wl-warn-50:  #fffbeb;
+  --wl-warn-500: #f59e0b;
+  --wl-error-50:  #fef2f2;
+  --wl-error-500: #ef4444;
+
+  /* Typography */
+  --wl-font-sans: var(--font-jakarta), 'Inter', -apple-system, system-ui, sans-serif;
+
+  /* Shadows */
+  --wl-shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
+  --wl-shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+  --wl-shadow-md: 0 2px 4px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06);
+  --wl-shadow-lg: 0 4px 12px rgba(15,23,42,0.05), 0 12px 28px rgba(15,23,42,0.08);
+  --wl-shadow-xl: 0 12px 32px rgba(15,23,42,0.10), 0 24px 60px rgba(15,23,42,0.12);
+  --wl-shadow-glow: 0 0 0 4px rgba(249,115,22,0.18);
+
+  /* Motion */
+  --wl-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --wl-fast: 120ms;
+  --wl-base: 200ms;
+  --wl-slow: 320ms;
+}
+
+@layer base {
   * {
-    @apply border-secondary-200;
+    @apply border-ink-200;
+    box-sizing: border-box;
   }
 
   body {
-    @apply bg-secondary-50 text-secondary-900;
+    @apply bg-surface-muted text-ink-900;
+    font-family: var(--wl-font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    transition: color var(--wl-fast) var(--wl-ease);
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 focus-visible:ring-offset-1;
   }
 }
