@@ -17,6 +17,10 @@ export async function signUp(
     years_of_experience?: number
   }
 ) {
+  // Self-service signup may only create end_user or it_professional
+  // accounts. Admin is never settable through this public action.
+  const safeRole: UserRole = role === 'it_professional' ? 'it_professional' : 'end_user'
+
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signUp({
@@ -25,7 +29,7 @@ export async function signUp(
     options: {
       data: {
         full_name: fullName,
-        role,
+        role: safeRole,
         ...metadata,
       },
     },

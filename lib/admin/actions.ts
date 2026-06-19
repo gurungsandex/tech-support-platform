@@ -2,19 +2,38 @@
 
 import { createClient } from '@/lib/supabase/server'
 
-export async function approveProfessional(id: string) {
+async function requireAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  await supabase.from('it_professional_profiles').update({ verification_status: 'approved', approved_at: new Date().toISOString(), approved_by: user?.id }).eq('id', id)
+  if (!user) return null
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') return null
+  return { supabase, user }
+}
+
+export async function approveProfessional(id: string) {
+  const ctx = await requireAdmin()
+  if (!ctx) return { error: 'Forbidden' }
+  const { supabase, user } = ctx
+  await supabase.from('it_professional_profiles').update({ verification_status: 'approved', approved_at: new Date().toISOString(), approved_by: user.id }).eq('id', id)
 }
 
 export async function rejectProfessional(id: string) {
-  const supabase = await createClient()
-  await supabase.from('it_professional_profiles').update({ verification_status: 'rejected' }).eq('id', id)
+  const ctx = await requireAdmin()
+  if (!ctx) return { error: 'Forbidden' }
+  await ctx.supabase.from('it_professional_profiles').update({ verification_status: 'rejected' }).eq('id', id)
 }
 
 export async function getPlatformStats() {
-  const supabase = await createClient()
+  const ctx = await requireAdmin()
+  if (!ctx) return { totalUsers: 0, totalProfessionals: 0, totalRequests: 0, averageRating: '0' }
+  const { supabase } = ctx
   const [users, pros, reqs] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
     supabase.from('it_professional_profiles').select('id', { count: 'exact', head: true }).eq('verification_status', 'approved'),
@@ -24,19 +43,22 @@ export async function getPlatformStats() {
 }
 
 export async function getPendingProfessionals() {
-  const supabase = await createClient()
-  const { data } = await supabase.from('it_professional_profiles').select('*, profile:profiles!it_professional_profiles_user_id_fkey(*)').eq('verification_status', 'pending')
+  const ctx = await requireAdmin()
+  if (!ctx) return []
+  const { data } = await ctx.supabase.from('it_professional_profiles').select('*, profile:profiles!it_professional_profiles_user_id_fkey(*)').eq('verification_status', 'pending')
   return data || []
 }
 
 export async function getAllReports() {
-  const supabase = await createClient()
-  const { data } = await supabase.from('reports').select('*, reporter:profiles!reports_reporter_id_fkey(full_name, email), reported_user:profiles!reports_reported_user_id_fkey(full_name, email)')
+  const ctx = await requireAdmin()
+  if (!ctx) return []
+  const { data } = await ctx.supabase.from('reports').select('*, reporter:profiles!reports_reporter_id_fkey(full_name, email), reported_user:profiles!reports_reported_user_id_fkey(full_name, email)')
   return data || []
 }
 
 export async function getAllUsers() {
-  const supabase = await createClient()
-  const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  const ctx = await requireAdmin()
+  if (!ctx) return []
+  const { data } = await ctx.supabase.from('profiles').select('*').order('created_at', { ascending: false })
   return data || []
 }
