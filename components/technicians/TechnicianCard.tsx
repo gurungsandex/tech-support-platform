@@ -67,7 +67,7 @@ export default function TechnicianCard({ technician }: Props) {
               <>
                 <span className="text-gray-300">·</span>
                 <MapPin className="h-3 w-3" />
-                <span>{technician.distance_miles.toFixed(1)} km away</span>
+                <span>{technician.distance_miles.toFixed(1)} mi away</span>
               </>
             )}
             {(technician.city || technician.state) && !technician.distance_miles && (

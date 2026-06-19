@@ -23,7 +23,6 @@
     "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {
-    "@next/swc-darwin-arm64": "^16.2.4",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
