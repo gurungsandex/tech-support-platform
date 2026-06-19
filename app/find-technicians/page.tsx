@@ -8,7 +8,8 @@ import Footer from '@/components/layout/Footer'
 import TechnicianCard from '@/components/technicians/TechnicianCard'
 import { searchTechnicians } from '@/lib/technicians/actions'
 import type { TechnicianSearchResult } from '@/lib/types/database'
-import { PREDEFINED_SERVICES, SERVICE_RADIUS_OPTIONS } from '@/lib/types/database'
+import { SERVICE_CATEGORIES, SERVICE_RADIUS_OPTIONS } from '@/lib/types/database'
+import type { ServiceCategory } from '@/lib/types/database'
 import { Search, MapPin, Loader, Map as MapIcon, LayoutGrid } from 'lucide-react'
 
 const TechnicianMap = dynamic(() => import('@/components/map/TechnicianMap'), {
@@ -19,11 +20,6 @@ const TechnicianMap = dynamic(() => import('@/components/map/TechnicianMap'), {
     </div>
   ),
 })
-
-const SERVICE_TYPES = [
-  'Networking', 'Hardware Repair', 'Software Support',
-  'Data Recovery', 'Cybersecurity', 'Cloud', 'Security', 'Printers',
-]
 
 function FindTechniciansContent() {
   const urlParams = useSearchParams()
@@ -38,7 +34,10 @@ function FindTechniciansContent() {
   const [supportType, setSupportType] = useState<'' | 'remote' | 'onsite' | 'both'>('')
   const [minRating, setMinRating] = useState<number | ''>('')
   const [onlineOnly, setOnlineOnly] = useState(false)
-  const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<ServiceCategory[]>(() => {
+    const c = urlParams?.get('category')
+    return c && (SERVICE_CATEGORIES as readonly string[]).includes(c) ? [c as ServiceCategory] : []
+  })
 
   const doSearch = useCallback(async () => {
     setLoading(true)
@@ -54,6 +53,7 @@ function FindTechniciansContent() {
       }
 
       if (service) params.service = service
+      if (selectedCategories.length) params.categories = selectedCategories
       if (supportType) params.supportType = supportType as 'remote' | 'onsite' | 'both'
       if (minRating) params.minRating = Number(minRating)
 
@@ -69,21 +69,21 @@ function FindTechniciansContent() {
     } finally {
       setLoading(false)
     }
-  }, [location, service, radius, supportType, minRating, onlineOnly])
+  }, [location, service, radius, supportType, minRating, onlineOnly, selectedCategories])
 
   useEffect(() => {
     doSearch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedCategories])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     doSearch()
   }
 
-  const toggleService = (s: string) => {
-    setSelectedServices(prev =>
-      prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+  const toggleCategory = (c: ServiceCategory) => {
+    setSelectedCategories(prev =>
+      prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
     )
   }
 
@@ -150,15 +150,15 @@ function FindTechniciansContent() {
                 <div>
                   <p className="mb-3 text-sm font-semibold text-gray-900">Service Type</p>
                   <div className="space-y-2">
-                    {SERVICE_TYPES.map((s) => (
-                      <label key={s} className="flex items-center gap-2.5 cursor-pointer">
+                    {SERVICE_CATEGORIES.map((c) => (
+                      <label key={c} className="flex items-center gap-2.5 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={selectedServices.includes(s)}
-                          onChange={() => toggleService(s)}
+                          checked={selectedCategories.includes(c)}
+                          onChange={() => toggleCategory(c)}
                           className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">{s}</span>
+                        <span className="text-sm text-gray-700">{c}</span>
                       </label>
                     ))}
                   </div>

@@ -8,6 +8,7 @@ import type {
   TechnicianPortfolioItem,
   TechnicianSearchResult,
   TechnicianPublicProfile,
+  ServiceCategory,
 } from '@/lib/types/database'
 
 export interface SearchParams {
@@ -15,6 +16,7 @@ export interface SearchParams {
   lng?: number
   radiusMiles?: number
   service?: string
+  categories?: ServiceCategory[]
   supportType?: 'remote' | 'onsite' | 'both'
   minRating?: number
   city?: string
@@ -27,7 +29,7 @@ export async function geocodeLocation(query: string): Promise<{ lat: number; lng
   try {
     const encoded = encodeURIComponent(query)
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`,
+      `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1&countrycodes=us`,
       {
         headers: { 'User-Agent': 'TechSupportPlatform/1.0' },
         next: { revalidate: 3600 },
@@ -71,6 +73,7 @@ export async function searchTechnicians(params: SearchParams): Promise<{
       service_filter: params.service ?? null,
       support_type_filter: params.supportType ?? null,
       min_rating: params.minRating ?? null,
+      category_filter: params.categories?.length ? params.categories : null,
     })
 
     if (error) throw error
@@ -295,6 +298,7 @@ export async function toggleProfilePause(isPaused: boolean): Promise<{
 export async function saveServices(services: Array<{
   id?: string
   service_name: string
+  category: ServiceCategory
   is_custom: boolean
   price_min?: number | null
   price_max?: number | null
@@ -311,6 +315,7 @@ export async function saveServices(services: Array<{
   const rows = services.map(s => ({
     technician_id: user.id,
     service_name: s.service_name,
+    category: s.category,
     is_custom: s.is_custom,
     price_min: s.price_min ?? null,
     price_max: s.price_max ?? null,

@@ -49,7 +49,7 @@ function RegisterContent() {
                 <Users className="h-5 w-5 text-blue-300" />
               </div>
               <div>
-                <p className="font-semibold text-white">1000+ IT Experts</p>
+                <p className="font-semibold text-white">Growing Network of IT Experts</p>
                 <p className="text-sm text-blue-200">A vast network ready to solve any problem.</p>
               </div>
             </div>

@@ -70,6 +70,7 @@ export interface TechnicianService {
   id: string
   technician_id: string
   service_name: string
+  category: ServiceCategory
   is_custom: boolean
   price_min: number | null
   price_max: number | null
@@ -255,29 +256,38 @@ export interface ITProfessionalWithProfile extends ITProfessionalProfile {
   reviews?: Review[]
 }
 
-// Predefined services list
-export const PREDEFINED_SERVICES = [
-  'Internet connectivity troubleshooting',
-  'Computer setup',
-  'Laptop troubleshooting',
-  'Printer setup and troubleshooting',
-  'Scanner setup',
-  'Ethernet wiring',
-  'Smart TV setup',
-  'Projector setup',
-  'Home office setup',
-  'Smart home device setup',
-  'Network troubleshooting',
-  'Small business IT support',
-  'General IT support',
-  'Virus and malware removal',
-  'Data backup and recovery',
-  'Software installation and configuration',
-  'Remote desktop support',
-  'Email setup and troubleshooting',
-  'Cloud storage setup',
-  'Security camera setup',
+// Broad service categories used for search filtering (must match the
+// `service_category` Postgres enum in supabase/migrations/006_service_categories.sql)
+export const SERVICE_CATEGORIES = [
+  'Networking', 'Hardware', 'Software', 'Security',
+  'Cybersecurity', 'Cloud', 'Data Recovery', 'Printers',
 ] as const
+
+export type ServiceCategory = typeof SERVICE_CATEGORIES[number]
+
+// Predefined services list, each tagged with its category
+export const PREDEFINED_SERVICES: { name: string; category: ServiceCategory }[] = [
+  { name: 'Internet connectivity troubleshooting', category: 'Networking' },
+  { name: 'Ethernet wiring', category: 'Networking' },
+  { name: 'Network troubleshooting', category: 'Networking' },
+  { name: 'Computer setup', category: 'Hardware' },
+  { name: 'Laptop troubleshooting', category: 'Hardware' },
+  { name: 'Scanner setup', category: 'Hardware' },
+  { name: 'Smart TV setup', category: 'Hardware' },
+  { name: 'Projector setup', category: 'Hardware' },
+  { name: 'Home office setup', category: 'Hardware' },
+  { name: 'Smart home device setup', category: 'Hardware' },
+  { name: 'Software installation and configuration', category: 'Software' },
+  { name: 'Remote desktop support', category: 'Software' },
+  { name: 'Email setup and troubleshooting', category: 'Software' },
+  { name: 'General IT support', category: 'Software' },
+  { name: 'Small business IT support', category: 'Software' },
+  { name: 'Security camera setup', category: 'Security' },
+  { name: 'Virus and malware removal', category: 'Cybersecurity' },
+  { name: 'Cloud storage setup', category: 'Cloud' },
+  { name: 'Data backup and recovery', category: 'Data Recovery' },
+  { name: 'Printer setup and troubleshooting', category: 'Printers' },
+]
 
 export const US_STATES = [
   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',

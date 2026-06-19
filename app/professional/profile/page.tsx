@@ -7,7 +7,8 @@ import {
   saveServices, saveCertifications, savePortfolioItem, deletePortfolioItem,
   toggleProfilePause, updateAvailabilityStatus
 } from '@/lib/technicians/actions'
-import { PREDEFINED_SERVICES, US_STATES, SERVICE_RADIUS_OPTIONS } from '@/lib/types/database'
+import { PREDEFINED_SERVICES, SERVICE_CATEGORIES, US_STATES, SERVICE_RADIUS_OPTIONS } from '@/lib/types/database'
+import type { ServiceCategory } from '@/lib/types/database'
 import type { TechnicianService, TechnicianCertification, TechnicianPortfolioItem } from '@/lib/types/database'
 import {
   Settings, MapPin, Briefcase, Award, FolderOpen, Eye, Power,
@@ -51,6 +52,7 @@ export default function TechnicianProfileEditor() {
   // Services
   const [services, setServices] = useState<Array<TechnicianService & { _dirty?: boolean }>>([])
   const [customService, setCustomService] = useState('')
+  const [customServiceCategory, setCustomServiceCategory] = useState<ServiceCategory>(SERVICE_CATEGORIES[0])
 
   // Certifications
   const [certs, setCerts] = useState<TechnicianCertification[]>([])
@@ -128,6 +130,7 @@ export default function TechnicianProfileEditor() {
     const result = await saveServices(services.map(s => ({
       id: s.id,
       service_name: s.service_name,
+      category: s.category,
       is_custom: s.is_custom,
       price_min: s.price_min,
       price_max: s.price_max,
@@ -151,12 +154,13 @@ export default function TechnicianProfileEditor() {
     else showMessage('success', 'Certifications saved!')
   }
 
-  const addPredefinedService = (name: string) => {
+  const addPredefinedService = (name: string, category: ServiceCategory) => {
     if (services.find(s => s.service_name === name)) return
     setServices(prev => [...prev, {
       id: crypto.randomUUID(),
       technician_id: '',
       service_name: name,
+      category,
       is_custom: false,
       price_min: null,
       price_max: null,
@@ -170,6 +174,7 @@ export default function TechnicianProfileEditor() {
       id: crypto.randomUUID(),
       technician_id: '',
       service_name: customService.trim(),
+      category: customServiceCategory,
       is_custom: true,
       price_min: null,
       price_max: null,
@@ -441,7 +446,10 @@ export default function TechnicianProfileEditor() {
               <div className="space-y-2 mb-6">
                 {services.map((s) => (
                   <div key={s.id} className="flex items-center gap-3 rounded-lg bg-gray-50 px-4 py-2.5">
-                    <span className="flex-1 text-sm font-medium text-gray-700">{s.service_name}</span>
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-gray-700">{s.service_name}</span>
+                      <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">{s.category}</span>
+                    </div>
                     <div className="flex items-center gap-1">
                       <span className="text-xs text-gray-400">$</span>
                       <input type="number" placeholder="Min" value={s.price_min ?? ''} onChange={e => updateServicePrice(s.id, 'price_min', e.target.value)}
@@ -462,8 +470,8 @@ export default function TechnicianProfileEditor() {
 
             <h3 className="text-sm font-medium text-gray-700 mb-3">Add Predefined Service</h3>
             <div className="flex flex-wrap gap-2 mb-5">
-              {PREDEFINED_SERVICES.map((name) => (
-                <button key={name} onClick={() => addPredefinedService(name)}
+              {PREDEFINED_SERVICES.map(({ name, category }) => (
+                <button key={name} onClick={() => addPredefinedService(name, category)}
                   disabled={!!services.find(s => s.service_name === name)}
                   className="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                   + {name}
@@ -476,6 +484,10 @@ export default function TechnicianProfileEditor() {
               <input value={customService} onChange={e => setCustomService(e.target.value)} placeholder="Custom service name..."
                 onKeyDown={e => e.key === 'Enter' && addCustomService()}
                 className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <select value={customServiceCategory} onChange={e => setCustomServiceCategory(e.target.value as ServiceCategory)}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                {SERVICE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
               <button onClick={addCustomService}
                 className="flex items-center gap-1 rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900 transition-colors">
                 <Plus className="h-4 w-4" /> Add

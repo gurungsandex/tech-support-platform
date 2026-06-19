@@ -102,7 +102,7 @@ export default async function HomePage() {
               {categories.map(({ icon: Icon, label, color, bg }) => (
                 <Link
                   key={label}
-                  href={`/find-technicians?service=${encodeURIComponent(label)}`}
+                  href={`/find-technicians?category=${encodeURIComponent(label)}`}
                   className="flex flex-col items-center gap-3 rounded-xl border border-ink-200 bg-white p-6 hover:border-primary-300 hover:shadow-md transition-all group"
                 >
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${bg}`}>
