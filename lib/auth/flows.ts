@@ -57,7 +57,16 @@ export async function signIn(email: string, password: string) {
     return { error: error.message }
   }
 
-  return { data }
+  // Look up the authoritative role from profiles rather than trusting
+  // user_metadata, which is set once at signup and goes stale the moment
+  // an admin is promoted directly in the database.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single()
+
+  return { data, role: profile?.role }
 }
 
 /**

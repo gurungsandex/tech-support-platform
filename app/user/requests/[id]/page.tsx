@@ -40,13 +40,14 @@ export default async function RequestDetailPage({
     .from('support_requests')
     .select(`
       *,
-      assigned_professional:it_professional_profiles(
-        user_id,
-        specialization,
-        experience_years,
-        rating,
-        certifications,
-        profiles(full_name, email)
+      assigned_professional:profiles!support_requests_professional_id_fkey(
+        full_name,
+        email,
+        it_professional_profiles!it_professional_profiles_user_id_fkey(
+          specialization,
+          years_of_experience,
+          average_rating
+        )
       ),
       messages(
         id,
@@ -174,23 +175,23 @@ export default async function RequestDetailPage({
               Assigned Professional
             </h2>
             <div className="flex items-start gap-4">
-              <Avatar 
-                name={request.assigned_professional.profiles?.full_name || 'Professional'}
+              <Avatar
+                name={request.assigned_professional.full_name || 'Professional'}
                 size="lg"
               />
               <div className="flex-1">
                 <h3 className="font-medium text-gray-900">
-                  {request.assigned_professional.profiles?.full_name || 'Professional'}
+                  {request.assigned_professional.full_name || 'Professional'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {request.assigned_professional.specialization}
+                  {request.assigned_professional.it_professional_profiles?.specialization}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  {request.assigned_professional.experience_years} years of experience
+                  {request.assigned_professional.it_professional_profiles?.years_of_experience} years of experience
                 </p>
-                {request.assigned_professional.rating && (
+                {request.assigned_professional.it_professional_profiles?.average_rating > 0 && (
                   <p className="text-sm text-gray-500">
-                    ⭐ {request.assigned_professional.rating.toFixed(1)} rating
+                    ⭐ {request.assigned_professional.it_professional_profiles.average_rating.toFixed(1)} rating
                   </p>
                 )}
               </div>
@@ -219,7 +220,7 @@ export default async function RequestDetailPage({
               messages={request.messages || []}
               currentUserId={user.id}
               otherUserId={request.professional_id || undefined}
-              otherUserName={request.assigned_professional?.profiles?.full_name || undefined}
+              otherUserName={request.assigned_professional?.full_name || undefined}
               showHeader={true}
               isReadOnly={request.status === 'completed'}
             />

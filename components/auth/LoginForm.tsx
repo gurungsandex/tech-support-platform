@@ -29,7 +29,7 @@ export default function LoginForm() {
       } else {
         router.refresh()
         const redirectTo = searchParams?.get('redirect')
-        const role = result.data?.user?.user_metadata?.role as string | undefined
+        const role = result.role
 
         if (redirectTo && redirectTo.startsWith('/')) {
           router.push(redirectTo)

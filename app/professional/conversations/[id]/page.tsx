@@ -69,9 +69,15 @@ export default function TechnicianConversationPage() {
   const handleSend = async () => {
     if (!input.trim() || sending) return
     setSending(true)
-    const { error: sendError } = await sendConversationMessage(conversationId, input)
-    if (sendError) setError(sendError)
-    else setInput('')
+    const { data, error: sendError } = await sendConversationMessage(conversationId, input)
+    if (sendError) {
+      setError(sendError)
+    } else {
+      setInput('')
+      if (data) {
+        setMessages((prev) => (prev.find((m) => m.id === data.id) ? prev : [...prev, data]))
+      }
+    }
     setSending(false)
   }
 

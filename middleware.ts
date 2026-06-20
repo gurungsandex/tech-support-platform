@@ -45,9 +45,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Authenticated user visiting login/register — redirect to their dashboard
+  // Authenticated user visiting login/register — redirect to their dashboard.
+  // Read the role from the profiles table rather than the JWT's
+  // user_metadata: metadata is set once at signup and never refreshed, so it
+  // goes stale the moment an admin promotes/demotes a user directly in the
+  // database (the only sanctioned way to grant admin, per 006_fix_role_escalation.sql).
   if (isAuthPath && user) {
-    const role = user.user_metadata?.role as string | undefined
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    const role = profile?.role
     let redirectPath = '/user/requests'
     if (role === 'admin') redirectPath = '/admin/dashboard'
     else if (role === 'it_professional') redirectPath = '/professional/dashboard'

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Search, MessageSquare, User, LogOut, Briefcase, Star, LayoutDashboard } from 'lucide-react'
 import { signOut } from '@/lib/auth/flows'
+import { getUnreadMessageCount } from '@/lib/conversations/actions'
 
 export default async function UserLayout({
   children,
@@ -30,9 +31,11 @@ export default async function UserLayout({
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
     : 'U'
 
+  const unreadCount = await getUnreadMessageCount()
+
   const navItems = [
     { href: '/user/requests', label: 'Overview', icon: LayoutDashboard },
-    { href: '/user/conversations', label: 'Messages', icon: MessageSquare, badge: 3 },
+    { href: '/user/conversations', label: 'Messages', icon: MessageSquare, badge: unreadCount },
     { href: '/user/requests', label: 'My Jobs', icon: Briefcase },
     { href: '/user/reviews', label: 'Reviews Given', icon: Star },
     { href: '/user/profile', label: 'Profile', icon: User },

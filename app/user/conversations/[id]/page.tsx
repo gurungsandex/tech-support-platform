@@ -83,9 +83,15 @@ export default function UserConversationPage() {
   const handleSend = async () => {
     if (!input.trim() || sending) return
     setSending(true)
-    const { error: sendError } = await sendConversationMessage(conversationId, input)
-    if (sendError) setError(sendError)
-    else setInput('')
+    const { data, error: sendError } = await sendConversationMessage(conversationId, input)
+    if (sendError) {
+      setError(sendError)
+    } else {
+      setInput('')
+      if (data) {
+        setMessages((prev) => (prev.find((m) => m.id === data.id) ? prev : [...prev, data]))
+      }
+    }
     setSending(false)
   }
 
@@ -178,6 +184,7 @@ export default function UserConversationPage() {
               <textarea value={reviewComment} onChange={e => setReviewComment(e.target.value)}
                 placeholder="Tell others about your experience..." rows={2}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+              {error && <p className="text-xs text-red-600">{error}</p>}
               <div className="flex gap-2">
                 <button onClick={handleSubmitReview} disabled={!reviewRating || reviewSubmitting}
                   className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50">

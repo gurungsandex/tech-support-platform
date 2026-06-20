@@ -3,6 +3,38 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Conversation, ConversationMessage, ConversationWithDetails } from '@/lib/types/database'
 
+// Total unread messages across all of the current user's conversations
+export async function getUnreadMessageCount(): Promise<number> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 0
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const isUser = profile?.role === 'end_user'
+
+  const { data: conversations } = await supabase
+    .from('conversations')
+    .select('id')
+    .eq(isUser ? 'user_id' : 'technician_id', user.id)
+    .neq('status', 'archived')
+
+  if (!conversations || conversations.length === 0) return 0
+
+  const { count } = await supabase
+    .from('conversation_messages')
+    .select('id', { count: 'exact', head: true })
+    .in('conversation_id', conversations.map((c) => c.id))
+    .eq('is_read', false)
+    .neq('sender_id', user.id)
+
+  return count ?? 0
+}
+
 // Start or get an existing conversation between user and technician
 export async function getOrCreateConversation(technicianId: string): Promise<{
   data: Conversation | null
@@ -61,7 +93,7 @@ export async function getMyConversations(): Promise<{
       user:profiles!conversations_user_id_fkey(id, full_name, avatar_url, email),
       technician:profiles!conversations_technician_id_fkey(
         id, full_name, avatar_url, email,
-        it_professional_profiles(profile_photo_url, availability_status, tagline)
+        it_professional_profiles!it_professional_profiles_user_id_fkey(profile_photo_url, availability_status, tagline)
       )
     `)
     .eq(isUser ? 'user_id' : 'technician_id', user.id)
@@ -116,7 +148,7 @@ export async function getConversation(conversationId: string): Promise<{
       user:profiles!conversations_user_id_fkey(id, full_name, avatar_url, email, phone_number),
       technician:profiles!conversations_technician_id_fkey(
         id, full_name, avatar_url, email, phone_number,
-        it_professional_profiles(profile_photo_url, availability_status, tagline, phone_number, phone_visibility, email_visibility)
+        it_professional_profiles!it_professional_profiles_user_id_fkey(profile_photo_url, availability_status, tagline, phone_number, phone_visibility, email_visibility)
       )
     `)
     .eq('id', conversationId)

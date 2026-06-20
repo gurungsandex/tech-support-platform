@@ -98,14 +98,14 @@ export async function getTechnicianPublicProfile(userId: string): Promise<{
       .from('profiles')
       .select(`
         id, full_name, email, avatar_url, phone_number,
-        it_professional_profiles!inner(*)
+        it_professional_profiles!it_professional_profiles_user_id_fkey!inner(*)
       `)
       .eq('id', userId)
       .single()
 
     if (profileError || !profile) return { data: null, error: 'Technician not found' }
 
-    const techProfile = (profile.it_professional_profiles as ITProfessionalProfile[])[0]
+    const techProfile = profile.it_professional_profiles as unknown as ITProfessionalProfile
     if (techProfile.verification_status !== 'approved') {
       return { data: null, error: 'Profile not available' }
     }
