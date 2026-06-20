@@ -1,11 +1,28 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [dashboardHref, setDashboardHref] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      if (profile?.role === 'admin') setDashboardHref('/admin/dashboard')
+      else if (profile?.role === 'it_professional') setDashboardHref('/professional/dashboard')
+      else setDashboardHref('/user/requests')
+    })
+  }, [])
 
   return (
     <header className="border-b border-ink-200 bg-white sticky top-0 z-50 shadow-xs">
@@ -32,15 +49,26 @@ export default function Header() {
             <Link href="/register?role=professional" className="text-sm font-medium text-ink-600 hover:text-ink-900 transition-colors">
               For Technicians
             </Link>
-            <Link href="/login" className="text-sm font-medium text-ink-600 hover:text-ink-900 transition-colors">
-              Log In
-            </Link>
-            <Link
-              href="/register"
-              className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600 transition-colors shadow-sm"
-            >
-              Get Started
-            </Link>
+            {dashboardHref ? (
+              <Link
+                href={dashboardHref}
+                className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600 transition-colors shadow-sm"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm font-medium text-ink-600 hover:text-ink-900 transition-colors">
+                  Log In
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600 transition-colors shadow-sm"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -73,17 +101,28 @@ export default function Header() {
                 onClick={() => setIsMobileMenuOpen(false)}>
                 For Technicians
               </Link>
-              <Link href="/login"
-                className="block rounded-md px-3 py-2.5 text-base font-medium text-ink-700 hover:bg-ink-50"
-                onClick={() => setIsMobileMenuOpen(false)}>
-                Log In
-              </Link>
-              <div className="px-3 py-2">
-                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full rounded-lg bg-primary-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary-600">
-                  Get Started
-                </Link>
-              </div>
+              {dashboardHref ? (
+                <div className="px-3 py-2">
+                  <Link href={dashboardHref} onClick={() => setIsMobileMenuOpen(false)}
+                    className="block w-full rounded-lg bg-primary-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary-600">
+                    Dashboard
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <Link href="/login"
+                    className="block rounded-md px-3 py-2.5 text-base font-medium text-ink-700 hover:bg-ink-50"
+                    onClick={() => setIsMobileMenuOpen(false)}>
+                    Log In
+                  </Link>
+                  <div className="px-3 py-2">
+                    <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full rounded-lg bg-primary-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary-600">
+                      Get Started
+                    </Link>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
