@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
+import { Turnstile } from '@marsidev/react-turnstile'
 import { signIn } from '@/lib/auth/flows'
 import Alert from '@/components/ui/Alert'
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 export default function LoginForm() {
   const router = useRouter()
@@ -13,16 +16,23 @@ export default function LoginForm() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setError('Please complete the verification challenge')
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      const result = await signIn(email, password)
+      const result = await signIn(email, password, turnstileToken)
 
       if (result.error) {
         setError(result.error)
@@ -57,8 +67,9 @@ export default function LoginForm() {
       )}
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+        <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
         <input
+          id="login-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -69,9 +80,10 @@ export default function LoginForm() {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
+        <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
         <div className="relative">
           <input
+            id="login-password"
             type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -82,6 +94,7 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -103,6 +116,14 @@ export default function LoginForm() {
           Forgot password?
         </button>
       </div>
+
+      {TURNSTILE_SITE_KEY && (
+        <Turnstile
+          siteKey={TURNSTILE_SITE_KEY}
+          onSuccess={setTurnstileToken}
+          onExpire={() => setTurnstileToken('')}
+        />
+      )}
 
       <button
         type="submit"

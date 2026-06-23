@@ -21,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={jakarta.variable}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <main>{children}</main>
+      </body>
     </html>
   )
 }

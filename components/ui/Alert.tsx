@@ -35,7 +35,11 @@ export default function Alert({ variant = 'info', title, children, className }: 
   const { container, icon: Icon, iconColor } = variants[variant]
 
   return (
-    <div className={cn('rounded-lg border p-4', container, className)}>
+    <div
+      role={variant === 'error' || variant === 'warning' ? 'alert' : 'status'}
+      aria-live="polite"
+      className={cn('rounded-lg border p-4', container, className)}
+    >
       <div className="flex">
         <div className="flex-shrink-0">
           <Icon className={cn('h-5 w-5', iconColor)} />

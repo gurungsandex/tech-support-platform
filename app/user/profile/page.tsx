@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
 import { ProfileForm } from '@/components/profile/ProfileForm'
+import { DeleteAccountSection } from '@/components/profile/DeleteAccountSection'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -53,6 +54,8 @@ export default async function ProfilePage() {
             <ProfileForm profile={profile} />
           </div>
         </Card>
+
+        <DeleteAccountSection />
       </div>
     </div>
   )

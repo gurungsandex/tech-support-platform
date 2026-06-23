@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Turnstile } from '@marsidev/react-turnstile'
 import { signUp } from '@/lib/auth/flows'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Alert from '@/components/ui/Alert'
 import type { UserRole } from '@/lib/types/database'
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 const SPECIALIZATIONS = [
   'Hardware',
@@ -36,6 +39,8 @@ export default function RegisterForm() {
     specialization: [] as string[],
     yearsOfExperience: 0,
   })
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -58,6 +63,18 @@ export default function RegisterForm() {
       return
     }
 
+    if (!ageConfirmed) {
+      setError('You must confirm you are 18 or older to create an account')
+      setIsLoading(false)
+      return
+    }
+
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setError('Please complete the verification challenge')
+      setIsLoading(false)
+      return
+    }
+
     try {
       const metadata = formData.role === 'it_professional' ? {
         specialization: formData.specialization,
@@ -69,6 +86,7 @@ export default function RegisterForm() {
         formData.password,
         formData.fullName,
         formData.role,
+        turnstileToken,
         metadata
       )
 
@@ -185,6 +203,30 @@ export default function RegisterForm() {
             required
           />
         </>
+      )}
+
+      <label className="flex items-start gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={ageConfirmed}
+          onChange={(e) => setAgeConfirmed(e.target.checked)}
+          required
+          className="mt-0.5 rounded border-secondary-300 text-primary-600 focus:ring-primary-600"
+        />
+        <span className="text-sm text-secondary-700">
+          I confirm I am 18 years of age or older and agree to the{' '}
+          <a href="/terms" target="_blank" className="underline font-medium">Terms of Service</a>{' '}
+          and{' '}
+          <a href="/privacy" target="_blank" className="underline font-medium">Privacy Policy</a>.
+        </span>
+      </label>
+
+      {TURNSTILE_SITE_KEY && (
+        <Turnstile
+          siteKey={TURNSTILE_SITE_KEY}
+          onSuccess={setTurnstileToken}
+          onExpire={() => setTurnstileToken('')}
+        />
       )}
 
       <Button type="submit" className="w-full" isLoading={isLoading}>

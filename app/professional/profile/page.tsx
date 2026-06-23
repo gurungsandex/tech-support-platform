@@ -7,6 +7,7 @@ import {
   saveServices, saveCertifications, savePortfolioItem, deletePortfolioItem,
   toggleProfilePause, updateAvailabilityStatus
 } from '@/lib/technicians/actions'
+import { DeleteAccountSection } from '@/components/profile/DeleteAccountSection'
 import { PREDEFINED_SERVICES, SERVICE_CATEGORIES, US_STATES, SERVICE_RADIUS_OPTIONS } from '@/lib/types/database'
 import type { ServiceCategory } from '@/lib/types/database'
 import type { TechnicianService, TechnicianCertification, TechnicianPortfolioItem } from '@/lib/types/database'
@@ -702,6 +703,8 @@ export default function TechnicianProfileEditor() {
             <Save className="h-4 w-4" />
             {saving ? 'Saving...' : 'Save Privacy Settings'}
           </button>
+
+          <DeleteAccountSection />
         </div>
       )}
     </div>

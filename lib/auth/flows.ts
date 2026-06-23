@@ -1,8 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import type { UserRole } from '@/lib/types/database'
+import { verifyTurnstileToken } from '@/lib/auth/turnstile'
 
 /**
  * Sign up a new user with email and password
@@ -12,11 +14,16 @@ export async function signUp(
   password: string,
   fullName: string,
   role: UserRole,
+  turnstileToken?: string,
   metadata?: {
     specialization?: string[]
     years_of_experience?: number
   }
 ) {
+  if (!(await verifyTurnstileToken(turnstileToken))) {
+    return { error: 'Verification failed. Please try again.' }
+  }
+
   // Self-service signup may only create end_user or it_professional
   // accounts. Admin is never settable through this public action.
   const safeRole: UserRole = role === 'it_professional' ? 'it_professional' : 'end_user'
@@ -45,7 +52,11 @@ export async function signUp(
 /**
  * Sign in a user with email and password
  */
-export async function signIn(email: string, password: string) {
+export async function signIn(email: string, password: string, turnstileToken?: string) {
+  if (!(await verifyTurnstileToken(turnstileToken))) {
+    return { error: 'Verification failed. Please try again.' }
+  }
+
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -132,4 +143,33 @@ export async function updatePassword(newPassword: string) {
   }
 
   return { success: true }
+}
+
+/**
+ * Permanently delete the current user's account.
+ *
+ * Deletes the auth.users row via the admin API, which cascades (ON DELETE
+ * CASCADE, see 001_initial_schema.sql) through profiles and every table that
+ * references it — conversations, support_requests, reviews, etc. This is
+ * the only legitimate use of the service-role key in this codebase: it's
+ * never exposed to the client, and it only ever acts on the caller's own
+ * id, confirmed via their own session before the admin client is touched.
+ */
+export async function deleteAccount() {
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+  if (userError || !user) {
+    return { error: 'You must be signed in to delete your account.' }
+  }
+
+  const adminClient = createAdminClient()
+  const { error } = await adminClient.auth.admin.deleteUser(user.id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  await supabase.auth.signOut()
+  redirect('/')
 }
